@@ -40,17 +40,17 @@ flowchart TD
         %% ASSET %%
         subgraph request-processing [Request Processing]
             subgraph request-type-processing [Obtain Paths]
-            parse-request[[Parse Request]]
-            asset-paths@{label: "Asset Path(s)", shape: docs}
-            asset-folder@{label: "Folderlike\nS3 Bucket, GCS Folder, ...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/folder.png", constrain:on}
-            asset-document@{label: "Listlike\nCSV, JSON, paths, ...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/document.png", constrain:on}
+                parse-request[[Parse Request]]
+                asset-paths@{label: "Asset Path(s)", shape: docs}
+                asset-folder@{label: "Folderlike\nS3 Bucket, GCS Folder, ...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/folder.png", constrain:on}
+                asset-document@{label: "Listlike\nCSV, JSON, paths, ...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/document.png", constrain:on}
             end
             subgraph asset-type-processing [Request Processing]
-            determine-asset-type[[Determine Asset Type]]
-            asset-image@{label: "Image", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/image.png", constrain:on}
-            asset-video-keyframe@{label: "Video Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-video.png", constrain:on}
-            asset-audio-keyframe@{label: "Audio Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-audio.png", constrain:on}
-            asset-video@{label: "Video", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/video.png", constrain:on}
+                determine-asset-type[[Determine Asset Type]]
+                asset-image@{label: "Image", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/image.png", constrain:on}
+                asset-video-keyframe@{label: "Video Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-video.png", constrain:on}
+                asset-audio-keyframe@{label: "Audio Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-audio.png", constrain:on}
+                asset-video@{label: "Video", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/video.png", constrain:on}
             end
         end
 
@@ -80,6 +80,7 @@ flowchart TD
 
                 %%transcribe-segment-audio[[Transcribe & Segment Audio]]
                 transcribe-audio[[Transcribe Audio]]
+                transcription@{label: "Transcription", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/transcript.png", constrain:on}
                 transcription@{ shape: doc, label: "Transcription" }
                 segment-audio[[Segment Transcription]]
                 segments@{ shape: docs, label: "Segments" }
@@ -95,6 +96,7 @@ flowchart TD
         %% EMBEDDING %%
         subgraph embedding-processing [Embedding]
             write-emb[[Write Embeddings]]
+            asset-embedding@{label: "Embedding", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/embedding.png", constrain:on}
             db-emb@{ shape: cyl, label: "Vector DB" }
         end
 
@@ -105,6 +107,10 @@ flowchart TD
             done["Done"]
             error["Error"]
         end
+            asset-embedding-image@{label: "Image\nEmbedding", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/embedding-image.png", constrain:on}
+            asset-embedding-kf-video@{label: "Video Keyframe\nEmbedding", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/embedding-kf-video.png", constrain:on}
+            asset-embedding-kf-audio@{label: "Audio Keyframe\nEmbedding", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/embedding-kf-audio.png", constrain:on}
+            asset-embedding-transcript@{label: "Audio Segment\nTranscript Embedding", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/embedding-transcript.png", constrain:on}
 
     end
 
@@ -154,20 +160,32 @@ flowchart TD
     audio-kfs --> determine-asset-type
 
     %% EMBEDDINGS
-    embeddings-visual -- "Image" --> write-emb
-    embeddings-visual -- "Video Keyframe" --> write-emb
-    embeddings-visual -- "Audio Keyframe" --> write-emb
-    embeddings-segments -- "Audio Segment Transcript" --> write-emb
-    write-emb --> db-emb
+    embeddings-visual --> asset-embedding-image --> write-emb
+    embeddings-visual --> asset-embedding-kf-video --> write-emb
+    embeddings-visual --> asset-embedding-kf-audio --> write-emb
+    embeddings-segments --> asset-embedding-transcript --> write-emb
+    write-emb --> asset-embedding --> db-emb
 
     classDef Pending fill:#89CFF0,color:black,stroke:black,stroke-width:5px
     classDef InProgress fill:orange,font-weight:italic,stroke:black,stroke-width:5px
     classDef Done fill:green,color:white,stroke:black,font-weight:bold,stroke-width:5px
     classDef Error fill:red,color:white,stroke:black,font-weight:bold,stroke-width:5px
 
-    classDef ImgNode fill:transparent,color:black,stroke-width:0px
-    class asset-document,asset-folder ImgNode
-    class asset-image,asset-video-keyframe,asset-audio-keyframe,asset-video, ImgNode
+    classDef ImgNodeBlackText fill:transparent,color:black,stroke-width:0px
+    class asset-folder ImgNodeBlackText
+    class asset-document ImgNodeBlackText
+    class asset-image ImgNodeBlackText
+    class asset-video-keyframe ImgNodeBlackText
+    class asset-audio-keyframe ImgNodeBlackText
+    class asset-video ImgNodeBlackText
+    class transcription ImgNodeBlackText
+    class asset-embedding-transcript ImgNodeBlackText
+    class asset-embedding-image ImgNodeBlackText
+    class asset-embedding-kf-video ImgNodeBlackText
+    class asset-embedding-kf-audio ImgNodeBlackText
+
+    classDef EmbNodeWhiteText fill:transparent,color:white,stroke-width:0px
+    class asset-embedding EmbNodeWhiteText
 
     pending ==> in-progress ==> done ~~~ error
 
@@ -180,7 +198,12 @@ flowchart TD
     class error, Error
 
     class request-processing, Pending
-    class image-processing,video-processing,audio-processing,shots-processing, InProgress
+    class request-type-processing Pending
+    class asset-type-processing Pending
+    class image-processing InProgress
+    class video-processing InProgress
+    class audio-processing InProgress
+    class shots-processing InProgress
     class embedding-processing Done
 ```
 ```mermaid
