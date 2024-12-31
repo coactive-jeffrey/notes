@@ -4,7 +4,31 @@
 ---
 title: "Ingestion | State Transitions"
 ---
-%%{init: {'theme':'forest'}}%%
+%%{
+  init: {
+    "logLevel": "debug",
+    "look": "classic",
+    "fontFamily": "monospace",
+    "securityLevel": "loose",
+    "theme": "forest",
+    "themeVariables": {
+        "edgeLabelBackground" : {
+            "opacity" : 0.0
+        }
+    },
+    "flowchart": {
+      "useMaxWidth": true,
+      "defaultRenderer": "elk",
+      "curve": "curve",
+      "htmlLabels": true
+    },
+    "elk": {
+        "mergeEdges" : true,
+        "nodePlacementStrategy" : "BRANDES_KOEPF"
+    }
+  }
+}%%
+
 flowchart TD
 
 
@@ -140,6 +164,10 @@ flowchart TD
     classDef InProgress fill:orange,font-weight:italic,stroke:black,stroke-width:5px
     classDef Done fill:green,color:white,stroke:black,font-weight:bold,stroke-width:5px
     classDef Error fill:red,color:white,stroke:black,font-weight:bold,stroke-width:5px
+
+    classDef ImgNode fill:transparent,color:black,stroke-width:0px
+    class asset-document,asset-folder ImgNode
+    class asset-image,asset-video-keyframe,asset-audio-keyframe,asset-video, ImgNode
 
     pending ==> in-progress ==> done ~~~ error
 
