@@ -14,14 +14,20 @@ flowchart TD
         request@{ shape: paper-tape, label: "Ingest Request" }
 
         %% ASSET %%
-        subgraph asset-processor [Request Processing]
+        subgraph request-processing [Request Processing]
+            subgraph request-type-processing [Obtain Paths]
+            parse-request[[Parse Request]]
+            asset-paths@{label: "Asset Path(s)", shape: docs}
+            asset-folder@{label: "Folderlike\nS3 Bucket, GCS Folder, ...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/folder.png", constrain:on}
+            asset-document@{label: "Listlike\nCSV, JSON, paths, ...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/document.png", constrain:on}
+            end
+            subgraph asset-type-processing [Request Processing]
             determine-asset-type[[Determine Asset Type]]
-            asset-image@{ label: "Image", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/image.png", constrain:on}
-            asset-video-keyframe@{ label: "Video Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-video.png", constrain:on}
-            asset-audio-keyframe@{ label: "Audio Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-audio.png", constrain:on}
-            asset-video@{ label: "Video", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/video.png", constrain:on}
-            asset-folder@{ label: "Folderlike\nS3 Bucket, GCS Folder, ...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/folder.png", constrain:on}
-            asset-document@{ label: "Listlike\nCSV, JSON, paths, ...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/document.png", constrain:on}
+            asset-image@{label: "Image", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/image.png", constrain:on}
+            asset-video-keyframe@{label: "Video Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-video.png", constrain:on}
+            asset-audio-keyframe@{label: "Audio Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-audio.png", constrain:on}
+            asset-video@{label: "Video", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/video.png", constrain:on}
+            end
         end
 
         %% IMAGE %%
@@ -40,7 +46,7 @@ flowchart TD
                 compute-shot-boundaries[[Compute Shot Boundaries]]
                 shots@{ shape: docs, label: "Shot Boundaries" }
                 generate-shot-kf[[Generate Keyframes]]
-                shot-kfs@{ shape: docs, label: "Keyframes" }
+                shot-kfs@{ shape: docs, label: "Video Keyframe\nPaths" }
             end
 
             %% AUDIO %%
@@ -55,10 +61,10 @@ flowchart TD
                 segments@{ shape: docs, label: "Segments" }
 
                 compute-text-emb[[Compute Text Embeddings]]
-                embeddings-segments@{ shape: docs, label: "Audio Segment Embeddings" }
+                embeddings-segments@{ shape: docs, label: "Audio Segment\nTranscript Embeddings" }
 
                 generate-audio-kf[[Generate Keyframes]]
-                audio-kfs@{ shape: docs, label: "Keyframes" }
+                audio-kfs@{ shape: docs, label: "Audio Keyframe\nPaths" }
             end
         end
 
@@ -79,11 +85,13 @@ flowchart TD
     end
 
     %% ASSET
-    request --> determine-asset-type
-    determine-asset-type
-        --> asset-folder
-    determine-asset-type
-        --> asset-document
+    request --> parse-request
+    parse-request --> asset-folder --> asset-paths
+    parse-request --> asset-document --> asset-paths
+    parse-request --> asset-paths
+
+    asset-paths --> determine-asset-type
+
     determine-asset-type
         --> asset-image
     determine-asset-type
@@ -122,8 +130,10 @@ flowchart TD
     audio-kfs --> determine-asset-type
 
     %% EMBEDDINGS
-    embeddings-visual --> write-emb
-    embeddings-segments --> write-emb
+    embeddings-visual -- "Image" --> write-emb
+    embeddings-visual -- "Video Keyframe" --> write-emb
+    embeddings-visual -- "Audio Keyframe" --> write-emb
+    embeddings-segments -- "Audio Segment Transcript" --> write-emb
     write-emb --> db-emb
 
     classDef Pending fill:#89CFF0,color:black,stroke:black,stroke-width:5px
@@ -131,7 +141,7 @@ flowchart TD
     classDef Done fill:green,color:white,stroke:black,font-weight:bold,stroke-width:5px
     classDef Error fill:red,color:white,stroke:black,font-weight:bold,stroke-width:5px
 
-    asset-folder ~~~ pending ==> in-progress ==> done ~~~ error
+    pending ==> in-progress ==> done ~~~ error
 
 
     classDef Legend fill:white,color:black,stroke:black,stroke-width:5px
@@ -141,7 +151,7 @@ flowchart TD
     class done, Done
     class error, Error
 
-    class asset-processor, Pending
+    class request-processing, Pending
     class image-processing,video-processing,audio-processing,shots-processing, InProgress
     class embedding-processing Done
 ```
