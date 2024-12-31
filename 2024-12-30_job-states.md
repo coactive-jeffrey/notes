@@ -16,12 +16,12 @@ flowchart TD
         %% ASSET %%
         subgraph asset-processor [Request Processing]
             determine-asset-type[[Determine Asset Type]]
-            asset-image@{           w:50, h:50, label: "Image", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/image.png", constrain:on}
-            asset-video-keyframe@{  w:50, h:50, label: "Video Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-video.png", constrain:on}
-            asset-audio-keyframe@{  w:50, h:50, label: "Audio Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-audio.png", constrain:on}
-            asset-video@{           w:50, h:50, label: "Video", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/video.png", constrain:on}
-            asset-folder@{          w:50, h:50, label: "Folderlike\nS3 Bucket, GCS Folder, ...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/folder.png", constrain:on}
-            asset-document@{        w:50, h:50, label: "Listlike\nCSV, JSON, paths, ...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/document.png", constrain:on}
+            asset-image@{ label: "Image", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/image.png", constrain:on}
+            asset-video-keyframe@{ label: "Video Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-video.png", constrain:on}
+            asset-audio-keyframe@{ label: "Audio Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-audio.png", constrain:on}
+            asset-video@{ label: "Video", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/video.png", constrain:on}
+            asset-folder@{ label: "Folderlike\nS3 Bucket, GCS Folder, ...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/folder.png", constrain:on}
+            asset-document@{ label: "Listlike\nCSV, JSON, paths, ...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/document.png", constrain:on}
         end
 
         %% IMAGE %%
