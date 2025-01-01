@@ -1,9 +1,10 @@
 # Ingestion | State Transitions
 
 ```mermaid
----
-title: "Ingestion | State Transitions"
----
+%%---
+%%title: "Ingestion State Transitions"
+%%---
+
 %%{
   init: {
     "logLevel": "debug",
@@ -11,42 +12,44 @@ title: "Ingestion | State Transitions"
     "securityLevel": "loose",
     "theme": "forest",
     "themeVariables": {
-        "wrap": false,
+        "wrap": true,
         "fontSize": "35px",
         "edgeLabelBackground" : {
             "opacity" : 0.0
         }
     },
     "flowchart": {
-      "useMaxWidth": true,
-      "defaultRenderer": "elk",
-      "curve": "curve",
+      "titleTopMargin": 0,
+      "subGraphTitleMargin": {
+          "top" : 8,
+          "bottom" : 32
+      },
+      "diagramPadding": 32,
+      "useMaxWidth": false,
+      "defaultRenderer": "dagre-wrapper",
+      "curve": "cardinal",
       "htmlLabels": true
-    },
-    "elk": {
-        "mergeEdges" : true,
-        "nodePlacementStrategy" : "BRANDES_KOEPF"
     }
   }
 }%%
 
 flowchart TD
 
-    %% STATES %%
-    subgraph states [" "]
-    direction LR
-        pending["Pending"]
-        in-progress["In Progress"]
-        done["Done"]
-        error["Error"]
-    end
-
     %% REQUEST %%
-    subgraph ingest-service ["Ingest&nbsp;Service"]
+    subgraph ingest-service [" "]
+        %% STATES %%
+        subgraph states ["States"]
+        direction LR
+            pending["Pending"]
+            in-progress["In Progress"]
+            done["Done"]
+            error["Error"]
+        end
+
         request@{ shape: paper-tape, label: "Ingest&nbsp;Request" }
 
         %% ASSET %%
-        subgraph request-processing ["Request&nbsp;Processing"]
+        subgraph request-processing ["Request"]
             subgraph request-type-processing [" "]
                 parse-request[[Parse Request]]
                 asset-single-path@{label: "Single Asset Path", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/target.png", constraint:on, w:16, h:16}
@@ -168,13 +171,13 @@ flowchart TD
     embeddings-segments --> asset-embedding-transcript --> write-emb
     write-emb --> asset-embedding --> db-emb
 
-    states ~~~ ingest-service
+    states ~~~ request
 
     classDef Pending fill:#89CFF0,color:black,stroke:black,stroke-width:5px
     classDef PendingSub fill:transparent,color:black,stroke:black,stroke-width:0px
     classDef InProgress fill:orange,font-weight:italic,stroke:black,stroke-width:5px
     classDef InProgressSub fill:orange,font-weight:italic,stroke:black,stroke-width:2px
-    classDef Done fill:green,color:white,stroke:black,font-weight:bold,stroke-width:5px
+    classDef Done fill:green,color:#FFFFFF,stroke:black,font-weight:italic,stroke-width:5px
     classDef Error fill:red,color:white,stroke:black,font-weight:bold,stroke-width:5px
 
     classDef ImgNodeBlackText fill:transparent,color:black,stroke-width:0px
@@ -191,10 +194,14 @@ flowchart TD
     class asset-embedding-kf-video ImgNodeBlackText
     class asset-embedding-kf-audio ImgNodeBlackText
 
-    classDef EmbNodeWhiteText fill:transparent,color:white,stroke-width:0px
+    classDef EmbNodeWhiteText fill:transparent,color:#FFFFFF,stroke-width:0px
     class asset-embedding EmbNodeWhiteText
 
     pending ==> in-progress ==> done ~~~ error
+    %%request-processing ~~~ image-processing
+    %%request-processing ~~~ video-processing
+    %%image-processing ~~~ embedding-processing
+    %%video-processing ~~~ embedding-processing
 
 
     classDef Legend fill:white,color:black,stroke:black,stroke-width:5px
