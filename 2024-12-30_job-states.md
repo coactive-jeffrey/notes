@@ -74,8 +74,8 @@ flowchart TD
 
         %% VIDEO %%
         subgraph video-processing [Video]
-            copy-video[[Copy Video]]
-            video-file@{ shape: paper-tape, label: "Video File" }
+            copy-video[["Copy&nbsp;Video&nbsp;to Our&nbsp;Bucket"]]
+            video-file@{label: "Video File", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/film.png", constraint:on}
 
             %% SHOTS %%
             subgraph shots-processing ["Shots"]
@@ -89,6 +89,7 @@ flowchart TD
             subgraph audio-processing ["Audio"]
                 extract-audio[["Extract Audio"]]
                 audio-file@{ shape: paper-tape, label: "Audio File" }
+                audio-file@{label: "Audio File", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/audio.png", constraint:on}
 
                 %%transcribe-segment-audio[[Transcribe & Segment Audio]]
                 transcribe-audio[[Transcribe Audio]]
@@ -188,6 +189,8 @@ flowchart TD
     class asset-video-keyframe ImgNodeBlackText
     class asset-audio-keyframe ImgNodeBlackText
     class asset-video ImgNodeBlackText
+    class video-file ImgNodeBlackText
+    class audio-file ImgNodeBlackText
     class transcription ImgNodeBlackText
     class asset-embedding-transcript ImgNodeBlackText
     class asset-embedding-image ImgNodeBlackText
