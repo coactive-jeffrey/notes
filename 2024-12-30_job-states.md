@@ -213,6 +213,8 @@ flowchart TD
     class shots-processing InProgressSub
     class embedding-processing Done
 ```
+
+## Mermaid Version
 ```mermaid
 info
 ```
