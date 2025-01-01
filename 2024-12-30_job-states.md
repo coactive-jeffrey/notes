@@ -8,10 +8,11 @@ title: "Ingestion | State Transitions"
   init: {
     "logLevel": "debug",
     "look": "classic",
-    "fontFamily": "monospace",
     "securityLevel": "loose",
     "theme": "forest",
     "themeVariables": {
+        "wrap": false,
+        "fontSize": "35px",
         "edgeLabelBackground" : {
             "opacity" : 0.0
         }
@@ -31,33 +32,41 @@ title: "Ingestion | State Transitions"
 
 flowchart TD
 
-
+    %% STATES %%
+    subgraph states [" "]
+    direction LR
+        pending["Pending"]
+        in-progress["In Progress"]
+        done["Done"]
+        error["Error"]
+    end
 
     %% REQUEST %%
-    subgraph ingest-service [Ingest Service]
-        request@{ shape: paper-tape, label: "Ingest Request" }
+    subgraph ingest-service ["Ingest&nbsp;Service"]
+        request@{ shape: paper-tape, label: "Ingest&nbsp;Request" }
 
         %% ASSET %%
-        subgraph request-processing [Request Processing]
-            subgraph request-type-processing [Obtain Paths]
+        subgraph request-processing ["Request&nbsp;Processing"]
+            subgraph request-type-processing [" "]
                 parse-request[[Parse Request]]
-                asset-paths@{label: "Asset Path(s)", shape: docs}
-                asset-folder@{label: "Folderlike\nS3 Bucket, GCS Folder, ...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/folder.png", constrain:on}
-                asset-document@{label: "Listlike\nCSV, JSON, paths, ...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/document.png", constrain:on}
+                asset-single-path@{label: "Single Asset Path", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/target.png", constraint:on, w:16, h:16}
+                asset-folder@{label: "Folderlike\nS3&nbsp;Bucket,&nbsp;GCS&nbsp;Folder,&nbsp;...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/folder.png", constraint:on, w:16, h:16}
+                asset-document@{label: "Listlike\nCSV,&nbsp;JSON,&nbsp;paths,&nbsp;...", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/document.png", constraint:on}
+                asset-paths@{label: "Asset&nbsp;Path(s)", shape: docs}
             end
-            subgraph asset-type-processing [Request Processing]
-                determine-asset-type[[Determine Asset Type]]
-                asset-image@{label: "Image", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/image.png", constrain:on}
-                asset-video-keyframe@{label: "Video Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-video.png", constrain:on}
-                asset-audio-keyframe@{label: "Audio Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-audio.png", constrain:on}
-                asset-video@{label: "Video", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/video.png", constrain:on}
+            subgraph asset-type-processing [" "]
+                determine-asset-type[["Determine Asset Type"]]
+                asset-image@{label: "Image", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/image.png", constraint:on}
+                asset-video-keyframe@{label: "Video Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-video.png", constraint:on}
+                asset-audio-keyframe@{label: "Audio Keyframe", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/kf-audio.png", constraint:on}
+                asset-video@{label: "Video", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/video.png", constraint:on}
             end
         end
 
         %% IMAGE %%
         subgraph image-processing [Image]
-            compute-visual-emb[[Compute Visual Embeddings]]
-            embeddings-visual@{ shape: docs, label: "Visual Embeddings" }
+            compute-visual-emb[["Compute&nbsp;Visual Embeddings"]]
+            embeddings-visual@{ shape: docs, label: "Visual&nbsp;Embeddings" }
         end
 
         %% VIDEO %%
@@ -66,59 +75,52 @@ flowchart TD
             video-file@{ shape: paper-tape, label: "Video File" }
 
             %% SHOTS %%
-            subgraph shots-processing [Shots Processing]
-                compute-shot-boundaries[[Compute Shot Boundaries]]
+            subgraph shots-processing ["Shots"]
+                compute-shot-boundaries[["Compute&nbsp;Shot Boundaries"]]
                 shots@{ shape: docs, label: "Shot Boundaries" }
                 generate-shot-kf[[Generate Keyframes]]
-                shot-kfs@{ shape: docs, label: "Video Keyframe\nPaths" }
+                shot-kfs@{ shape: docs, label: "Video&nbsp;Keyframe Paths" }
             end
 
             %% AUDIO %%
-            subgraph audio-processing [Audio Processing]
-                extract-audio[[Extract Audio]]
+            subgraph audio-processing ["Audio"]
+                extract-audio[["Extract Audio"]]
                 audio-file@{ shape: paper-tape, label: "Audio File" }
 
                 %%transcribe-segment-audio[[Transcribe & Segment Audio]]
                 transcribe-audio[[Transcribe Audio]]
-                transcription@{label: "Transcription", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/transcript.png", constrain:on}
+                transcription@{label: "Transcription", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/transcript.png", constraint:on}
                 transcription@{ shape: doc, label: "Transcription" }
-                segment-audio[[Segment Transcription]]
+                segment-audio[["Split&nbsp;Transcription Into Segments"]]
                 segments@{ shape: docs, label: "Segments" }
 
-                compute-text-emb[[Compute Text Embeddings]]
-                embeddings-segments@{ shape: docs, label: "Audio Segment\nTranscript Embeddings" }
+                compute-text-emb[["Compute&nbsp;Text Embeddings"]]
+                embeddings-segments@{ shape: docs, label: "Audio&nbsp;Segment\nTranscript&nbsp;Embeddings" }
 
                 generate-audio-kf[[Generate Keyframes]]
-                audio-kfs@{ shape: docs, label: "Audio Keyframe\nPaths" }
+                audio-kfs@{ shape: docs, label: "Audio&nbsp;Keyframe Paths" }
             end
         end
 
         %% EMBEDDING %%
         subgraph embedding-processing [Embedding]
             write-emb[[Write Embeddings]]
-            asset-embedding@{label: "Embedding", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/embedding.png", constrain:on}
+            asset-embedding@{label: "Embedding", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/embedding.png", constraint:on}
             db-emb@{ shape: cyl, label: "Vector DB" }
         end
 
-        %% STATES %%
-        subgraph states ["States"]
-            pending["Pending"]
-            in-progress["In Progress"]
-            done["Done"]
-            error["Error"]
-        end
-            asset-embedding-image@{label: "Image\nEmbedding", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/embedding-image.png", constrain:on}
-            asset-embedding-kf-video@{label: "Video Keyframe\nEmbedding", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/embedding-kf-video.png", constrain:on}
-            asset-embedding-kf-audio@{label: "Audio Keyframe\nEmbedding", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/embedding-kf-audio.png", constrain:on}
-            asset-embedding-transcript@{label: "Audio Segment\nTranscript Embedding", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/embedding-transcript.png", constrain:on}
+        asset-embedding-image@{label: "Image\nEmbedding", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/embedding-image.png", constraint:on}
+        asset-embedding-kf-video@{label: "Video&nbsp;Keyframe\nEmbedding", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/embedding-kf-video.png", constraint:on}
+        asset-embedding-kf-audio@{label: "Audio&nbsp;Keyframe\nEmbedding", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/embedding-kf-audio.png", constraint:on}
+        asset-embedding-transcript@{label: "Audio&nbsp;Segment&nbsp;Transcript\nEmbedding", img: "https://raw.githubusercontent.com/coactive-jeffrey/notes/refs/heads/main/assets/embedding-transcript.png", constraint:on}
 
     end
 
     %% ASSET
     request --> parse-request
+    parse-request --> asset-single-path --> asset-paths
     parse-request --> asset-folder --> asset-paths
     parse-request --> asset-document --> asset-paths
-    parse-request --> asset-paths
 
     asset-paths --> determine-asset-type
 
@@ -166,12 +168,17 @@ flowchart TD
     embeddings-segments --> asset-embedding-transcript --> write-emb
     write-emb --> asset-embedding --> db-emb
 
+    states ~~~ ingest-service
+
     classDef Pending fill:#89CFF0,color:black,stroke:black,stroke-width:5px
+    classDef PendingSub fill:transparent,color:black,stroke:black,stroke-width:0px
     classDef InProgress fill:orange,font-weight:italic,stroke:black,stroke-width:5px
+    classDef InProgressSub fill:orange,font-weight:italic,stroke:black,stroke-width:2px
     classDef Done fill:green,color:white,stroke:black,font-weight:bold,stroke-width:5px
     classDef Error fill:red,color:white,stroke:black,font-weight:bold,stroke-width:5px
 
     classDef ImgNodeBlackText fill:transparent,color:black,stroke-width:0px
+    class asset-single-path ImgNodeBlackText
     class asset-folder ImgNodeBlackText
     class asset-document ImgNodeBlackText
     class asset-image ImgNodeBlackText
@@ -198,12 +205,12 @@ flowchart TD
     class error, Error
 
     class request-processing, Pending
-    class request-type-processing Pending
-    class asset-type-processing Pending
+    class request-type-processing PendingSub
+    class asset-type-processing PendingSub
     class image-processing InProgress
     class video-processing InProgress
-    class audio-processing InProgress
-    class shots-processing InProgress
+    class audio-processing InProgressSub
+    class shots-processing InProgressSub
     class embedding-processing Done
 ```
 ```mermaid
